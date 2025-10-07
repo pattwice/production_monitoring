@@ -1,0 +1,56 @@
+services:
+  # Authentication Database
+  auth_db:
+    image: postgres
+    container_name: auth_db
+    environment:
+      POSTGRES_USER: auth_admin
+      POSTGRES_PASSWORD: auth_password_123
+      POSTGRES_DB: auth_db
+    ports:
+      - "5433:5432"  # Note: Different port to avoid conflict
+    volumes:
+      - auth_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - app_network
+
+  # Production Monitoring Database
+  production_db:
+    image: postgres
+    container_name: production_db
+    environment:
+      POSTGRES_USER: prod_admin
+      POSTGRES_PASSWORD: prod_password_123
+      POSTGRES_DB: production_monitoring
+    ports:
+      - "5432:5432"  # Default PostgreSQL port
+    volumes:
+      - production_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - app_network
+
+  # PgAdmin for database management
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "5050:80"
+    depends_on:
+      - auth_db
+      - production_db
+    restart: unless-stopped
+    networks:
+      - app_network
+
+volumes:
+  auth_data:
+  production_data:
+
+networks:
+  app_network:
+    driver: bridge
