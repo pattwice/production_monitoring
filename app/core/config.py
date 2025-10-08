@@ -1,7 +1,7 @@
-from pydantic_settings import BaseSettings
-from typing import List
+from pydantic_settings import BaseSettings as _BaseSettings
+from typing import List as _List
 
-class Settings(BaseSettings):
+class Settings(_BaseSettings):
     """
     Application settings loaded from environment variables.
     """
@@ -34,7 +34,7 @@ class Settings(BaseSettings):
     ALLOWED_ORIGINS: str = "http://localhost:3000"
     
     @property
-    def origins_list(self) -> List[str]:
+    def origins_list(self) -> _List[str]:
         """Convert comma-separated string to list"""
         return [origin.strip() for origin in self.ALLOWED_ORIGINS.split(",")]
     

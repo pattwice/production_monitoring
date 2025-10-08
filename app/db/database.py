@@ -1,11 +1,83 @@
-import sqlalchemy as _sql
-import sqlalchemy.ext.declarative as _declarative
-import sqlalchemy.orm as _orm
+from sqlalchemy import create_engine as _create_engine
+from sqlalchemy.ext.declarative import declarative_base as _declarative_base
+from sqlalchemy.orm import sessionmaker as _sessionmaker
 
-DATABASE_URL = "postgresql://admin:admin123@localhost:5432/production_monitoring"
+from app.core.config import settings as _settings
 
-engine = _sql.create_engine(DATABASE_URL)
+# ============================================
+# AUTHENTICATION DATABASE
+# ============================================
 
-SessionLocal = _orm.sessionmaker(autocommit=False, autoflush=False, bind=engine)
+# Create auth database engine
+auth_engine = _create_engine(
+    _settings.AUTH_DATABASE_URL,
+    pool_pre_ping=True,
+    echo=True  # Set to False in live production, true for debug
+)
 
-Base = _declarative.declarative_base()
+# Session factory for auth database
+AuthSessionLocal = _sessionmaker(autocommit=False, autoflush=False, bind=auth_engine)
+
+# Base class for auth models
+AuthBase = _declarative_base()
+
+def get_auth_db():
+    """
+    Dependency to get auth database session.
+    Use this for all authentication-related operations.
+    """
+    db = AuthSessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+# ============================================
+# PRODUCTION DATABASE
+# ============================================
+
+# Create production database engine
+prod_engine = _create_engine(
+    _settings.PROD_DATABASE_URL,
+    pool_pre_ping=True,
+    echo=True  # Set to False in live production, true for debug
+)
+
+# Session factory for production database
+ProdSessionLocal = _sessionmaker(autocommit=False, autoflush=False, bind=prod_engine)
+
+# Base class for production models
+ProdBase = _declarative_base()
+
+def get_prod_db():
+    """
+    Dependency to get production database session.
+    Use this for all production data operations.
+    """
+    db = ProdSessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+# ============================================
+# INITIALIZATION FUNCTIONS
+# ============================================
+
+def init_auth_db():
+    """Create all auth database tables"""
+    AuthBase.metadata.create_all(bind=auth_engine)
+    print("Auth database tables created")
+
+def init_prod_db():
+    """Create all production database tables"""
+    ProdBase.metadata.create_all(bind=prod_engine)
+    print("Production database tables created")
+
+def init_databases():
+    """Initialize both databases"""
+    init_auth_db()
+    init_prod_db()
+    print("All databases initialized")
