@@ -12,7 +12,7 @@ from app.core.config import settings as _settings
 auth_engine = _create_engine(
     _settings.AUTH_DATABASE_URL,
     pool_pre_ping=True,
-    echo=True  # Set to False in live production, true for debug
+    echo=True  # Set to False in live production, True for debug
 )
 
 # Session factory for auth database
@@ -24,7 +24,6 @@ AuthBase = _declarative_base()
 def get_auth_db():
     """
     Dependency to get auth database session.
-    Use this for all authentication-related operations.
     """
     db = AuthSessionLocal()
     try:
@@ -41,7 +40,7 @@ def get_auth_db():
 prod_engine = _create_engine(
     _settings.PROD_DATABASE_URL,
     pool_pre_ping=True,
-    echo=True  # Set to False in live production, true for debug
+    echo=True  # Set to False in live production, True for debug
 )
 
 # Session factory for production database
@@ -53,7 +52,6 @@ ProdBase = _declarative_base()
 def get_prod_db():
     """
     Dependency to get production database session.
-    Use this for all production data operations.
     """
     db = ProdSessionLocal()
     try:
