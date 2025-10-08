@@ -1,7 +1,7 @@
 services:
   # Authentication Database
   auth_db:
-    image: postgres
+    image: postgres:latest
     container_name: auth_db
     environment:
       POSTGRES_USER: auth_admin
@@ -17,7 +17,7 @@ services:
 
   # Production Monitoring Database
   production_db:
-    image: postgres
+    image: postgres:latest
     container_name: production_db
     environment:
       POSTGRES_USER: prod_admin
