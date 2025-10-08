@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine as _create_engine
-from sqlalchemy.ext.declarative import declarative_base as _declarative_base
-from sqlalchemy.orm import sessionmaker as _sessionmaker
+import sqlalchemy.ext.declarative as _declarative
+import sqlalchemy.orm as _orm
 
 from app.core.config import settings as _settings
 
@@ -16,10 +16,10 @@ auth_engine = _create_engine(
 )
 
 # Session factory for auth database
-AuthSessionLocal = _sessionmaker(autocommit=False, autoflush=False, bind=auth_engine)
+AuthSessionLocal = _orm.sessionmaker(autocommit=False, autoflush=False, bind=auth_engine)
 
 # Base class for auth models
-AuthBase = _declarative_base()
+AuthBase = _declarative.declarative_base()
 
 def get_auth_db():
     """
@@ -44,10 +44,10 @@ prod_engine = _create_engine(
 )
 
 # Session factory for production database
-ProdSessionLocal = _sessionmaker(autocommit=False, autoflush=False, bind=prod_engine)
+ProdSessionLocal = _orm.sessionmaker(autocommit=False, autoflush=False, bind=prod_engine)
 
 # Base class for production models
-ProdBase = _declarative_base()
+ProdBase = _declarative.declarative_base()
 
 def get_prod_db():
     """
