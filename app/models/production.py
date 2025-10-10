@@ -30,8 +30,8 @@ class WorkElement(_ProdBase):
     """
     __tablename__ = "work_elements"
 
-    id = _sql.column(_sql.Integer, primary_key=True, index=True)
-    station_id = _sql.Column(_sql.Integer, _sql.ForeignKey("stations,id"), nullable=False)
+    id = _sql.Column(_sql.Integer, primary_key=True, index=True)
+    station_id = _sql.Column(_sql.Integer, _sql.ForeignKey("stations.id"), nullable=False)
     element_code = _sql.Column(_sql.String, index=True, nullable=False)
     element_name = _sql.Column(_sql.String, nullable=False)
     description = _sql.Column(_sql.String)
@@ -41,7 +41,7 @@ class WorkElement(_ProdBase):
 
     # Relationships
     station = _orm.relationship("Station", back_populates="work_elements")
-    cycle_records = _orm.relationship("CycletimeRecord", back_populates="workelement")
+    cycle_records = _orm.relationship("CycleTimeRecord", back_populates="work_element")
     threshold = _orm.relationship("StatisticalThreshold", back_populates="work_element", uselist=False) # 1-to-1
     
     def __repr__(self):
@@ -55,7 +55,7 @@ class CycleTimeRecord(_ProdBase):
 
     id = _sql.Column(_sql.Integer, primary_key=True, index=True)
     station_id = _sql.Column(_sql.Integer, _sql.ForeignKey("stations.id"), nullable=False)
-    work_element_id = _sql.Column(_sql.Integer, _sql.ForeignKey("work_elements.id"))
+    work_element_id = _sql.Column(_sql.Integer, _sql.ForeignKey("work_elements.id"), nullable=False)
     
     # Cycle time data
     cycle_number = _sql.Column(_sql.Integer)
@@ -81,7 +81,7 @@ class StatisticalThreshold(_ProdBase):
     """
     __tablename__ = "statistical_thresholds"
 
-    id = _sql.column(_sql.Integer, primary_key=True, index=True)
+    id = _sql.Column(_sql.Integer, primary_key=True, index=True)
     work_element_id = _sql.Column(_sql.Integer, _sql.ForeignKey("work_elements.id"), nullable=False)
 
     # Statistical Data
