@@ -3,7 +3,7 @@ import fastapi as _fastapi
 
 from app.models.user import User as _User
 from app.schemas.user import UserCreate as _UserCreate
-from app.core.security import get_hash_password as _get_hash_password ,verify_password as _verify_password
+from app.core.security import get_hash_password as _get_hash_password, verify_password as _verify_password
 
 class AuthService:
     """Handles all authentication logic"""
@@ -35,20 +35,16 @@ class AuthService:
         return db_user
     
     @staticmethod
-    def authentication_user(db: _orm.Session, username: str, password: str) -> _User:
+    def authenticate_user(db: _orm.Session, username: str, password: str) -> _User:
         """Verify username and password from auth database"""
         user = db.query(_User).filter(_User.username == username).first()
 
-        if not user:
+        if not user or not _verify_password(password, user.hashed_password):
+            # Combine user check and password verification for security
             raise _fastapi.HTTPException(
                 status_code=_fastapi.status.HTTP_401_UNAUTHORIZED,
-                detail="Incorrect username or password"
-            )
-        
-        if not _verify_password(password, user.hashed_password):
-            raise _fastapi.HTTPException(
-                status_code=_fastapi.status.HTTP_401_UNAUTHORIZED,
-                detail="Incorrect username or password"
+                detail="Incorrect username or password",
+                headers={"WWW-Authenticate": "Bearer"}, # Standard for 401
             )
         
         if not user.is_active:

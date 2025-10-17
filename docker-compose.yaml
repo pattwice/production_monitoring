@@ -7,23 +7,25 @@ services:
     ports:
       - "8000:8000"
     env_file:
-      - docker.env
+      - .env
     depends_on:
       - auth_db
       - production_db
     restart: unless-stopped
     networks:
       - app_network
+
   # Authentication Database
   auth_db:
-    image: postgres:latest
+    image: postgres:16-alpine # Pinned to a specific version
     container_name: auth_db
     environment:
-      POSTGRES_USER: auth_admin
-      POSTGRES_PASSWORD: auth_password_123
-      POSTGRES_DB: auth_db
+      # Secrets are now referenced from the .env file
+      POSTGRES_USER: ${AUTH_DB_USER}
+      POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD}
+      POSTGRES_DB: ${AUTH_DB_NAME}
     ports:
-      - "5433:5432"  # Note: Different port to avoid conflict
+      - "5433:5432"
     volumes:
       - auth_data:/var/lib/postgresql/data
     restart: unless-stopped
@@ -32,14 +34,15 @@ services:
 
   # Production Monitoring Database
   production_db:
-    image: postgres:latest
+    image: postgres:16-alpine # Pinned to a specific version
     container_name: production_db
     environment:
-      POSTGRES_USER: prod_admin
-      POSTGRES_PASSWORD: prod_password_123
-      POSTGRES_DB: production_monitoring
+      # Secrets are now referenced from the .env file
+      POSTGRES_USER: ${PROD_DB_USER}
+      POSTGRES_PASSWORD: ${PROD_DB_PASSWORD}
+      POSTGRES_DB: ${PROD_DB_NAME}
     ports:
-      - "5432:5432"  # Default PostgreSQL port
+      - "5432:5432"
     volumes:
       - production_data:/var/lib/postgresql/data
     restart: unless-stopped
@@ -48,11 +51,12 @@ services:
 
   # PgAdmin for database management
   pgadmin:
-    image: dpage/pgadmin4:latest
+    image: dpage/pgadmin4:latest # :latest is acceptable for a dev tool
     container_name: pgadmin
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: admin123
+      # Secrets are now referenced from the .env file
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
     ports:
       - "5050:80"
     depends_on:

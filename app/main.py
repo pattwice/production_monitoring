@@ -2,7 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.api.routes import auth
-from app.db.database import init_databases
+# Remove init_databases as it should not be run on startup in production
+# from app.db.database import init_databases 
 
 # Create FastAPI app
 app = FastAPI(
@@ -21,13 +22,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize databases on startup
-@app.on_event("startup")
-def startup_event():
-    """Create all database tables on startup"""
-    from app.models.user import User
-    from app.models.production import Station, WorkElement, CycleTimeRecord, StatisticalThreshold    
-    init_databases()
+# =================================================================
+# NOTE: Database initialization on startup is removed.
+# Use a migration tool like Alembic to manage database schema.
+# For example, run `alembic upgrade head` from terminal.
+# =================================================================
+# @app.on_event("startup")
+# def startup_event():
+#     """Create all database tables on startup - NOT RECOMMENDED FOR PRODUCTION"""
+#     from app.models.user import User
+#     from app.models.production import Station, WorkElement, CycleTimeRecord, StatisticalThreshold    
+#     init_databases()
 
 # Include authentication routes
 app.include_router(auth.router, prefix=settings.API_V1_PREFIX)
@@ -36,20 +41,15 @@ app.include_router(auth.router, prefix=settings.API_V1_PREFIX)
 def root():
     """Root endpoint - health check"""
     return {
-        "message": "Production Monitoring API",
+        "message": "Production Monitoring API is running!",
         "version": "1.0.0",
         "docs": f"{settings.API_V1_PREFIX}/docs",
-        "databases": {
-            "auth": "auth_db (port 5433)",
-            "production": "production_monitoring (port 5432)"
-        }
     }
 
 @app.get("/health")
 def health_check():
     """Health check endpoint"""
-    return {
-        "status": "healthy",
-        "auth_db": settings.AUTH_DB_NAME,
-        "prod_db": settings.PROD_DB_NAME
-    }
+    # FIX: Removed references to settings attributes that no longer exist.
+    # This endpoint now just confirms the API is responsive.
+    # A more advanced health check might try to connect to the databases.
+    return {"status": "healthy"}
