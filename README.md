@@ -22,7 +22,7 @@ A robust backend service designed to monitor production line cycle times. This a
 - **Migrations**: Alembic
 - **Containerization**: Docker, Docker Compose
 - **Data Validation**: Pydantic
-- **Authentication**: `python-jose`, `passlib`
+- **Authentication**: python-jose, passlib
 
 ## 🚀 Getting Started
 
@@ -32,8 +32,8 @@ Follow these instructions to get the project up and running on your local machin
 
 You must have the following installed on your system:
 
-- Docker
-- Python 3.12+ and `pip` (for running Alembic commands locally)
+- [Docker](https://www.docker.com/products/docker-desktop)
+- [Python 3.12+](https://www.python.org/downloads/) and `pip` (for running Alembic commands locally)
 
 ### 1. Clone the Repository
 
