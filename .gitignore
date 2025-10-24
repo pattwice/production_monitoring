@@ -36,3 +36,4 @@ Thumbs.db
 Stattable-MP1.csv
 Tabledata.csv
 *.csv
+alembic/
