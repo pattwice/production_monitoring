@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.api.routes import auth
+from app.db.database import AuthBase, auth_engine
+from app.models import user
 # Remove init_databases as it should not be run on startup in production
 # from app.db.database import init_databases 
 
@@ -21,6 +23,20 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.on_event("startup")
+def create_auth_tables():
+    """
+    Create all tables in the auth_db database.
+    This is safe because create_all(checkfirst=True) 
+    will not modify existing tables.
+    """
+    print("Attempting to create Auth database tables...")
+    try:
+        AuthBase.metadata.create_all(bind=auth_engine, checkfirst=True)
+        print("Auth database tables created (if they didn't exist).")
+    except Exception as e:
+        print(f"Error creating auth tables: {e}")
 
 # =================================================================
 # NOTE: Database initialization on startup is removed.
