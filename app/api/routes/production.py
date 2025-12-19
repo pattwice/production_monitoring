@@ -1,54 +1,41 @@
-import pydantic as _pd
-import datetime as _dt
-from typing import Optional as _Optional, List as _List
+from typing import List
+import fastapi as _fastapi
+import sqlalchemy.orm as _orm
 
-# STATION
-class StationBase(_pd.BaseModel):
-    station_code: str = _pd.Field(..., min_length=2, max_length=20)
-    station_name: str = _pd.Field(..., min_length=3, max_length=100)
-    description: _Optional[str] = None
-    is_active: bool = True
+from app.db.database import get_prod_db
+from app.schemas import production as _schemas
+from app.services.production_service import ProductionService
+from app.api.routes.auth import get_current_user
 
-class StationCreate(StationBase):
-    pass
+router = _fastapi.APIRouter(prefix="/production", tags=["Production Management"])
 
-class StationResponse(StationBase):
-    id: int
-    created_at: _dt.datetime
+@router.post("/stations", response_model=_schemas.StationResponse, status_code=201)
+def create_station(
+    station: _schemas.StationCreate, 
+    db: _orm.Session = _fastapi.Depends(get_prod_db),
+    user = _fastapi.Depends(get_current_user)
+):
+    return ProductionService.create_station(db, station)
 
-    class Config:
-        from_attributes = True
+@router.get("/stations", response_model=List[_schemas.StationResponse])
+def list_stations(
+    db: _orm.Session = _fastapi.Depends(get_prod_db),
+    user = _fastapi.Depends(get_current_user)
+):
+    return ProductionService.get_stations(db)
 
-# WORK ELEMENT
-class WorkElementBase(_pd.BaseModel):
-    element_code: str
-    element_name: str
-    description: _Optional[str] = None
-    sequence_order: int = 1
+@router.post("/work-elements", response_model=_schemas.WorkElementResponse, status_code=201)
+def create_work_element(
+    element: _schemas.WorkElementCreate, 
+    db: _orm.Session = _fastapi.Depends(get_prod_db),
+    user = _fastapi.Depends(get_current_user)
+):
+    return ProductionService.create_work_element(db, element)
 
-class WorkElementCreate(WorkElementBase):
-    station_id: int
-
-class WorkElementResponse(WorkElementBase):
-    id: int
-    station_id: int
-    created_at: _dt.datetime
-
-    class Config:
-        from_attributes = True
-
-# --- CYCLE TIME (Records) ---
-class CycleTimeCreate(_pd.BaseModel):
-    station_id: int
-    work_element_id: int
-    cycle_time: float
-    cycle_number: int
-    is_outlier: bool = False
-
-class CycleTimeResponse(CycleTimeCreate):
-    id: int
-    recorded_at: _dt.datetime
-    date_only: str
-
-    class Config:
-        from_attributes = True
+@router.post("/cycles", response_model=_schemas.CycleTimeResponse, status_code=201)
+def record_cycle(
+    record: _schemas.CycleTimeCreate,
+    db: _orm.Session = _fastapi.Depends(get_prod_db),
+    user = _fastapi.Depends(get_current_user)
+):
+    return ProductionService.record_cycle_time(db, record)
