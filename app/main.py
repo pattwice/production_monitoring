@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.api.routes import auth
+from app.api.routes import auth, production
 from app.db.database import AuthBase, auth_engine
 from app.models import user
 # Remove init_databases as it should not be run on startup in production
@@ -52,6 +52,7 @@ def create_auth_tables():
 
 # Include authentication routes
 app.include_router(auth.router, prefix=settings.API_V1_PREFIX)
+app.include_router(production.router, prefix=settings.API_V1_PREFIX)
 
 @app.get("/")
 def root():
@@ -65,7 +66,4 @@ def root():
 @app.get("/health")
 def health_check():
     """Health check endpoint"""
-    # FIX: Removed references to settings attributes that no longer exist.
-    # This endpoint now just confirms the API is responsive.
-    # A more advanced health check might try to connect to the databases.
     return {"status": "healthy"}
