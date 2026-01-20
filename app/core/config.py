@@ -29,6 +29,8 @@ class Settings(BaseSettings):
         return [origin.strip() for origin in self.ALLOWED_ORIGINS.split(",")]
 
     class Config:
+        env_file = ".env"
+        extra = "ignore"
         case_sensitive = True
 
 # Create a single instance
