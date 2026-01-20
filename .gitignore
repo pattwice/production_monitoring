@@ -36,3 +36,7 @@ Thumbs.db
 Stattable-MP1.csv
 Tabledata.csv
 *.csv
+import_data.py
+oftencommand.txt
+seed_database.py
+tests/test.py
