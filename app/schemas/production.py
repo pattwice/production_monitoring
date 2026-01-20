@@ -25,6 +25,7 @@ class WorkElementBase(_pd.BaseModel):
     element_name: str
     description: _Optional[str] = None
     sequence_order: int = 1
+    standard_time: float = 10.0
 
 class WorkElementCreate(WorkElementBase):
     station_id: int
@@ -44,6 +45,8 @@ class CycleTimeCreate(_pd.BaseModel):
     cycle_time: float
     cycle_number: int
     is_outlier: bool = False
+    shift: str = "Day"
+    operator: str = "Operator 1"
 
 class CycleTimeResponse(CycleTimeCreate):
     id: int

@@ -36,6 +36,7 @@ class WorkElement(_ProdBase):
     element_name = _sql.Column(_sql.String, nullable=False)
     description = _sql.Column(_sql.String)
     sequence_order = _sql.Column(_sql.Integer)
+    standard_time = _sql.Column(_sql.Float, default=10.0)
     is_active = _sql.Column(_sql.Boolean, default=True)
     created_at = _sql.Column(_sql.DateTime(timezone=True), server_default=_func.now())
 
@@ -61,6 +62,10 @@ class CycleTimeRecord(_ProdBase):
     cycle_number = _sql.Column(_sql.Integer)
     cycle_time = _sql.Column(_sql.Float, nullable=False) # Seconds
     
+    #new fields
+    shift = _sql.Column(_sql.String, default="Day")
+    operator = _sql.Column(_sql.String, default="Operator1") # Don't have in the mock data
+
     # Timestamp
     recorded_at = _sql.Column(_sql.DateTime(timezone=True), server_default=_func.now())
     date_only = _sql.Column(_sql.String, index=True)  # YYYY-MM-DD
