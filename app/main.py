@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.api.routes import auth, production
+from app.api.routes import auth, production, analytics
 from app.db.database import AuthBase, auth_engine
 from app.models import user
 # Remove init_databases as it should not be run on startup in production
@@ -53,6 +53,7 @@ def create_auth_tables():
 # Include authentication routes
 app.include_router(auth.router, prefix=settings.API_V1_PREFIX)
 app.include_router(production.router, prefix=settings.API_V1_PREFIX)
+app.include_router(analytics.router, prefix=settings.API_V1_PREFIX)
 
 @app.get("/")
 def root():
