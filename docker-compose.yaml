@@ -2,6 +2,9 @@ services:
   api:
     build: .
     container_name: api
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
     volumes:
       - .:/app
     ports:
@@ -54,9 +57,11 @@ services:
     image: dpage/pgadmin4:latest # :latest is acceptable for a dev tool
     container_name: pgadmin
     environment:
-      # Secrets are now referenced from the .env file
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      PGADMIN_LOAD_SERVERS: "True"
+    volumes:
+      - ./pgadmin/servers.json:/pgadmin4/servers.json
     ports:
       - "5050:80"
     depends_on:
