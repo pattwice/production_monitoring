@@ -55,7 +55,27 @@ class AuthService:
         return user
     
     @staticmethod
-    def get_current_user(db: _orm.Session, username: str) -> _User:
+    def get_users(db: _orm.Session):
+        """Get all users from auth database"""
+        return db.query(_User).all()
+
+    @staticmethod
+    def update_user(db: _orm.Session, user_id: int, user_data: _UserCreate) -> _User:
+        """Update a user's details (is_active, is_superuser)"""
+        db_user = db.query(_User).filter(_User.id == user_id).first()
+        if not db_user:
+            raise _fastapi.HTTPException(status_code=404, detail="User not found")
+        
+        update_data = user_data.model_dump(exclude_unset=True)
+        for key, value in update_data.items():
+            setattr(db_user, key, value)
+        
+        db.commit()
+        db.refresh(db_user)
+        return db_user
+
+    @staticmethod
+    def get_user_by_username(db: _orm.Session, username: str) -> _User:
         """Get user by username from auth database"""
         user = db.query(_User).filter(_User.username == username).first()
         
