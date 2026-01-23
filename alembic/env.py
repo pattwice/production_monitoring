@@ -1,3 +1,4 @@
+from app.core.config import settings
 from app.db.database import ProdBase
 from app.models import production
 from logging.config import fileConfig
@@ -10,6 +11,10 @@ from alembic import context
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
+
+# Set the database URL from the application settings (environment variable)
+# This overrides the sqlalchemy.url in alembic.ini
+config.set_main_option('sqlalchemy.url', settings.PROD_DATABASE_URL)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
