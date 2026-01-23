@@ -1,57 +1,68 @@
-import pydantic as _pd
-import datetime as _dt
-from typing import Optional as _Optional, List as _List
+from pydantic import BaseModel, Field
+from typing import List, Optional
 
-# --- STATION ---
-class StationBase(_pd.BaseModel):
-    station_code: str = _pd.Field(..., min_length=2, max_length=20)
-    station_name: str = _pd.Field(..., min_length=3, max_length=100)
-    description: _Optional[str] = None
-    is_active: bool = True
+# ============================================
+# Station Schemas
+# ============================================
+
+class StationBase(BaseModel):
+    station_code: str = Field(..., example="MP1")
+    station_name: str = Field(..., example="Main Production Line 1")
+    description: Optional[str] = None
 
 class StationCreate(StationBase):
     pass
 
 class StationResponse(StationBase):
     id: int
-    created_at: _dt.datetime
+    is_active: bool
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
-# --- WORK ELEMENT (Tasks) ---
-class WorkElementBase(_pd.BaseModel):
-    element_code: str
-    element_name: str
-    description: _Optional[str] = None
-    sequence_order: int = 1
-    standard_time: float = 10.0
+# ============================================
+# Work Element Schemas
+# ============================================
+
+class WorkElementBase(BaseModel):
+    station_id: int
+    element_code: str = Field(..., example="MP1-WE01")
+    element_name: str = Field(..., example="Assembly the first sitepage")
+    standard_time: float = Field(..., example=10.5)
 
 class WorkElementCreate(WorkElementBase):
-    station_id: int
+    pass
+
+class WorkElementUpdate(BaseModel):
+    standard_time: float = Field(..., example=12.0)
 
 class WorkElementResponse(WorkElementBase):
     id: int
-    station_id: int
-    created_at: _dt.datetime
-
+    is_active: bool
+    
     class Config:
-        from_attributes = True
+        orm_mode = True
 
-# --- CYCLE TIME (Records) ---
-class CycleTimeCreate(_pd.BaseModel):
+# ============================================
+# Cycle Time Schemas
+# ============================================
+
+class CycleTimeBase(BaseModel):
     station_id: int
     work_element_id: int
     cycle_time: float
-    cycle_number: int
-    is_outlier: bool = False
-    shift: str = "Day"
-    operator: str = "Operator 1"
+    cycle_number: Optional[int] = None
+    is_outlier: Optional[bool] = False
+    shift: Optional[str] = "Day"
+    operator: Optional[str] = "Operator"
 
-class CycleTimeResponse(CycleTimeCreate):
+class CycleTimeCreate(CycleTimeBase):
+    pass
+
+class CycleTimeResponse(CycleTimeBase):
     id: int
-    recorded_at: _dt.datetime
+    recorded_at: str 
     date_only: str
 
     class Config:
-        from_attributes = True
+        orm_mode = True
