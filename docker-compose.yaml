@@ -12,8 +12,10 @@ services:
     env_file:
       - .env
     depends_on:
-      - auth_db
-      - production_db
+      auth_db:
+        condition: service_healthy
+      production_db:
+        condition: service_healthy
     restart: unless-stopped
     networks:
       - app_network
@@ -31,6 +33,11 @@ services:
       - "5433:5432"
     volumes:
       - auth_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${AUTH_DB_USER} -d ${AUTH_DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
     networks:
       - app_network
@@ -48,6 +55,11 @@ services:
       - "5432:5432"
     volumes:
       - production_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PROD_DB_USER} -d ${PROD_DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
     networks:
       - app_network
