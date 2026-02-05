@@ -1,42 +1,22 @@
-# --- Virtual Environment ---
-venv/
-.venv/
-
-# --- Environment Files ---
-.env
 *.env
-
-# --- Python Cache & Artifacts ---
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
-
-# --- Build, Distribution, and Test Artifacts ---
-build/
-dist/
-*.egg-info/
-.pytest_cache/
-htmlcov/
-.coverage
-
-# --- IDE / Editor specific files ---
+grant_superuser.py
+seed_database.py
+import_data.py
 .vscode/
 .idea/
 *.swp
-
-# --- OS specific files ---
 .DS_Store
 Thumbs.db
-
-# --- Log files ---
 *.log
-
-# --- Data Files ---
 Stattable-MP1.csv
 Tabledata.csv
 *.csv
-import_data.py
-oftencommand.txt
-seed_database.py
-tests/test.py
+.pytest_cache/
+htmlcov/
+.coverage
+tests/__pycache__/
+*venv/
