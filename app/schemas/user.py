@@ -6,7 +6,7 @@ class UserBase(_pd.BaseModel):
     """Base schema with common fields"""
     email: _pd.EmailStr
     username: str = _pd.Field(..., min_length=3, max_length=50)
-    fullname: Optional[str] = None
+    full_name: Optional[str] = None
 
 class UserCreate(UserBase):
     """Schema for creating a new user"""

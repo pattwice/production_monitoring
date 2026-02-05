@@ -25,7 +25,7 @@ class AuthService:
         db_user = _User(
             email=user_data.email,
             username=user_data.username,
-            full_name=user_data.fullname,
+            full_name=user_data.full_name,
             hashed_password=_get_hash_password(user_data.password)
         )
 
