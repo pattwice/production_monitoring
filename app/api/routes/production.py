@@ -56,3 +56,13 @@ def record_cycle(
     user = _fastapi.Depends(get_current_user)
 ):
     return ProductionService.record_cycle_time(db, record)
+
+@router.get("/work-elements-info", response_model=List[_schemas.WorkElementInfo])
+def get_work_elements_info_route(
+    db: _orm.Session = _fastapi.Depends(get_prod_db),
+    user = _fastapi.Depends(get_current_user)
+):
+    """
+    Returns a list of work elements with their station names and sequence order.
+    """
+    return ProductionService.get_work_elements_info(db)

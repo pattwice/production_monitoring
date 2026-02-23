@@ -101,3 +101,23 @@ class ProductionService:
                 }
             }
         return response_data
+    
+    @staticmethod
+    def get_work_elements_info(db: _orm.Session) -> list[_schemas.WorkElementInfo]:
+        """
+        Fetches all work elements along with their station names, ordered by sequence_order.
+        """
+        results = db.query(
+            _models.WorkElement.element_name,
+            _models.Station.station_name,
+            _models.WorkElement.sequence_order
+        ).join(_models.Station, _models.WorkElement.station_id == _models.Station.id)\
+         .order_by(_models.WorkElement.sequence_order).all()
+
+        return [
+            _schemas.WorkElementInfo(
+                element_name=element_name,
+                station_name=station_name,
+                sequence_order=sequence_order
+            ) for element_name, station_name, sequence_order in results
+        ]

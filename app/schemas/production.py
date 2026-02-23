@@ -43,6 +43,12 @@ class WorkElementResponse(WorkElementBase):
     class Config:
         orm_mode = True
 
+class WorkElementInfo(BaseModel):
+    element_name: str
+    station_name: str
+    sequence_order: int
+
+
 # ============================================
 # Cycle Time Schemas
 # ============================================
