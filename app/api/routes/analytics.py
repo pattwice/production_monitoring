@@ -16,13 +16,17 @@ def get_ct_data(
     db: _orm.Session = _fastapi.Depends(get_prod_db), 
     user=_fastapi.Depends(get_current_user),
     task: Optional[str] = None,
-    date: Optional[str] = None
+    date: Optional[str] = None,
+    station_name: Optional[str] = None
 ):
     """
     Returns cycle time data.
     If 'task' query parameter is provided, filters data for that task.
     If 'date' query parameter is provided, filters data for that date.
+    If 'station_name' is provided, returns all tasks for that station.
     """
+    if station_name:
+        return AnalyticsService.get_cycle_times_by_station(db, station_name=station_name, date=date)
     if task:
         return AnalyticsService.get_cycle_time_by_task(db, task=task, date=date)
     

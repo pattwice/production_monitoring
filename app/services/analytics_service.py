@@ -83,6 +83,51 @@ class AnalyticsService:
         return output
 
     @staticmethod
+    def get_cycle_times_by_station(db: _orm.Session, station_name: str, date: str = None):
+        # Find the station first
+        station = db.query(_models.Station).filter(_models.Station.station_name == station_name).first()
+        if not station:
+            return []
+
+        # Then query all records for that station
+        query = db.query(
+            _models.CycleTimeRecord,
+            _models.Station,
+            _models.WorkElement
+        ).select_from(_models.CycleTimeRecord)\
+         .join(_models.Station, _models.CycleTimeRecord.station_id == _models.Station.id)\
+         .join(_models.WorkElement, _models.CycleTimeRecord.work_element_id == _models.WorkElement.id)\
+         .filter(_models.CycleTimeRecord.station_id == station.id)
+
+        if date:
+            query = query.filter(_models.CycleTimeRecord.date_only == date)
+            
+        results = query.all()
+        
+        output = []
+        for record, station, element in results:
+            outlier_val = None
+            if record.is_outlier:
+                outlier_val = round(record.cycle_time - element.standard_time, 4)
+
+            output.append(_schemas.FrontendCycleTime(
+                cycleId=record.cycle_number,
+                lineId=station.id,
+                lineName=station.station_name,
+                businessDate=record.date_only,
+                shift=record.shift,
+                station=station.station_name,
+                operator=record.operator,
+                task=element.element_name,
+                ct=record.cycle_time,
+                outlier=outlier_val,
+                time=record.recorded_at.strftime("%H:%M"),
+                standard=element.standard_time
+            ))
+        return output
+
+
+    @staticmethod
     def get_production_volume(db: _orm.Session):
         # This function provides aggregated hourly production volume.
         PLANNED_PER_HOUR = 72  # A reasonable target, e.g., 3600s in an hour / ~50s per full cycle
